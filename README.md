@@ -24,5 +24,5 @@ Druid提供的AST开发简单、灵活、并且性能达到生产级别。
 
 1. 工具中会自动判断当前数据库环境是否是达梦数据库，是的时候才会拦截修改
 
-#### <a href="https://gitee.com/myth20/mysql2dm-spring-boot-starter/blob/master/DETAIL.md" title="详细文档">详细文档</a>
+#### <a href="./DETAIL.md" title="详细文档">详细文档</a>
 
