@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.myth.mysql2dm.config.Mysql2dmAutoConfiguration
