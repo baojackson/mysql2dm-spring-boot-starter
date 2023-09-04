@@ -285,7 +285,9 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
     public boolean visit(SQLAlterTableAddColumn x) {
         // 兼容Mysql有afterColumn
         x.getColumns().forEach(col -> col.accept(this));
-        x.getAfterColumn().accept(this);
+        if (x.getAfterColumn() != null) {
+            x.getAfterColumn().accept(this);
+        }
         return false;
     }
 
@@ -298,6 +300,15 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 ReflectUtil.setFieldValue(dataType, "arguments", new ArrayList<>(0));
                 LOGGER.error(LOG_PREFIX + "bit/int等去除长度");
             }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean visit(SQLBinaryExpr x) {
+        SQLObject parent = x.getParent();
+        if (parent instanceof SQLReplaceable) {
+            ((SQLReplaceable) parent).replace(x, new SQLCharExpr(x.getText()));
         }
         return true;
     }

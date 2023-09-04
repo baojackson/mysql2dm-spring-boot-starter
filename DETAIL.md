@@ -103,3 +103,7 @@ CREATE FUNCTION FUNC_OP_MY_DIVIDE( C1 IN NUMBER,
 ### JSON操作符->>替换为JSON_VALUE
 
 > 说明
+
+### b'0/1'替换为'0/1'
+
+> 说明
