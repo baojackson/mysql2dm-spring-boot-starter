@@ -169,9 +169,14 @@ public class DmDruidFilter extends FilterEventAdapter {
     }
 
     private String modifySql(String originalSql) {
-        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(originalSql);
-        DmSupportVisitor visitor = new DmSupportVisitor();
-        sqlStatement.accept(visitor);
-        return sqlStatement.toString();
+        try {
+            SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(originalSql);
+            DmSupportVisitor visitor = new DmSupportVisitor();
+            sqlStatement.accept(visitor);
+            return sqlStatement.toString();
+        } catch (Exception e) {
+            LOGGER.error("处理失败, sql: " + originalSql, e);
+            return originalSql;
+        }
     }
 }
