@@ -173,9 +173,16 @@ public class DmDruidFilter extends FilterEventAdapter {
             SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(originalSql);
             DmSupportVisitor visitor = new DmSupportVisitor();
             sqlStatement.accept(visitor);
-            return sqlStatement.toString();
+            String modifiedSql = sqlStatement.toString();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(StrUtil.format("dameng adapter modify success, origin sql: {}, \n" +
+                        "actual sql: {}", originalSql, modifiedSql));
+            } else {
+                LOGGER.error(StrUtil.format("dameng adapter modify success, actual sql: {}", modifiedSql));
+            }
+            return modifiedSql;
         } catch (Exception e) {
-            LOGGER.error("处理失败, sql: " + originalSql, e);
+            LOGGER.error(StrUtil.format("dameng adapter modify failed, sql: {}", originalSql), e);
             return originalSql;
         }
     }

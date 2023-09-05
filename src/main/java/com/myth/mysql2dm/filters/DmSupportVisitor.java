@@ -85,7 +85,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
         String searchChar = "`";
         String replacementChar = "\"";
         if (StrUtil.contains(str, searchChar)) {
-            LOGGER.error(LOG_PREFIX + "转换特殊符号, `->\"");
+            LOGGER.debug(LOG_PREFIX + "转换特殊符号, `->\"");
             return StrUtil.replace(str, searchChar, replacementChar);
         }
         return str;
@@ -113,9 +113,9 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 if (CollUtil.isNotEmpty(x.getAttributes())) {
                     ReflectUtil.setFieldValue(x, "attributes", null);
                 }
-                LOGGER.error(LOG_PREFIX + "替换函数名成功, " + message);
+                LOGGER.debug(LOG_PREFIX + "替换函数名成功, " + message);
             } else {
-                LOGGER.error(LOG_PREFIX + "替换函数名失败, 参数只支持一个, " + message);
+                LOGGER.debug(LOG_PREFIX + "替换函数名失败, 参数只支持一个, " + message);
             }
         }
         return true;
@@ -145,7 +145,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                     sqlCaseExpr.addItem(new SQLCaseExpr.Item(sqlExpr0, sqlExpr1));
                     sqlCaseExpr.setElseExpr(sqlExpr2);
                     sqlReplaceable.replace(x, sqlCaseExpr);
-                    LOGGER.error(LOG_PREFIX + "IF转case when");
+                    LOGGER.debug(LOG_PREFIX + "IF转case when");
                     sqlExpr0.accept(this);
                     sqlExpr1.accept(this);
                     sqlExpr2.accept(this);
@@ -161,7 +161,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                     if (sqlExpr1 instanceof SQLDataTypeRefExpr) {
                         SQLCastExpr sqlCastExpr = new SQLCastExpr(sqlExpr0, ((SQLDataTypeRefExpr) sqlExpr1).getDataType());
                         sqlReplaceable.replace(x, sqlCastExpr);
-                        LOGGER.error(LOG_PREFIX + "CONVERT转CAST");
+                        LOGGER.debug(LOG_PREFIX + "CONVERT转CAST");
                         sqlExpr0.accept(this);
                         sqlExpr1.accept(this);
                         return false;
@@ -173,16 +173,16 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 x.setArgument(0, new SQLCharExpr("\""));
                 x.setMethodName("TRIM");
                 x.setFrom(arg0);
-                LOGGER.error(LOG_PREFIX + "JSON_UNQUOTE转TRIM");
+                LOGGER.debug(LOG_PREFIX + "JSON_UNQUOTE转TRIM");
                 arg0.accept(this);
                 return false;
             case "st_contains":
                 x.setMethodName(StrUtil.concat(true, "dmgeo.", methodName));
-                LOGGER.error(LOG_PREFIX + "ST_CONTAINS转dmgeo.ST_CONTAINS");
+                LOGGER.debug(LOG_PREFIX + "ST_CONTAINS转dmgeo.ST_CONTAINS");
                 return true;
             case "st_distance_sphere":
                 x.setMethodName(StrUtil.concat(true, "dmgeo.", "ST_Distance"));
-                LOGGER.error(LOG_PREFIX + "ST_DISTANCE_SPHERE转dmgeo.ST_Distance");
+                LOGGER.debug(LOG_PREFIX + "ST_DISTANCE_SPHERE转dmgeo.ST_Distance");
                 return true;
             case "point":
                 if (parent instanceof SQLReplaceable) {
@@ -196,7 +196,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                     sqlMethodInvokeExpr.addArgument(concatMethod);
                     sqlMethodInvokeExpr.addArgument(new SQLNumberExpr(0));
                     ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
-                    LOGGER.error(LOG_PREFIX + "POINT转dmgeo.ST_GeomFromText(CONCAT('POINT(',arg0,arg1,)'))");
+                    LOGGER.debug(LOG_PREFIX + "POINT转dmgeo.ST_GeomFromText(CONCAT('POINT(',arg0,arg1,)'))");
                     for (SQLExpr argument : sqlMethodInvokeExpr.getArguments()) {
                         argument.accept(this);
                     }
@@ -209,7 +209,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                     sqlMethodInvokeExpr.addArgument(x.getArguments().get(0));
                     sqlMethodInvokeExpr.addArgument(new SQLNumberExpr(0));
                     ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
-                    LOGGER.error(LOG_PREFIX + "geometry_from_text转dmgeo.ST_GeomFromText");
+                    LOGGER.debug(LOG_PREFIX + "geometry_from_text转dmgeo.ST_GeomFromText");
                     for (SQLExpr argument : sqlMethodInvokeExpr.getArguments()) {
                         argument.accept(this);
                     }
@@ -233,7 +233,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
         if (x.getRight() instanceof SQLBooleanExpr) {
             boolean booleanValue = ((SQLBooleanExpr) x.getRight()).getBooleanValue();
             x.setRight(new SQLNumberExpr(booleanValue ? 1 : 0));
-            LOGGER.error(LOG_PREFIX + "boolean转0/1");
+            LOGGER.debug(LOG_PREFIX + "boolean转0/1");
         }
 
         SQLObject parent = x.getParent();
@@ -245,7 +245,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 sqlMethodInvokeExpr.addArgument(left);
                 sqlMethodInvokeExpr.addArgument(right);
                 ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
-                LOGGER.error(LOG_PREFIX + "除法分母为0校验");
+                LOGGER.debug(LOG_PREFIX + "除法分母为0校验");
                 left.accept(this);
                 right.accept(this);
                 return false;
@@ -258,7 +258,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 sqlMethodInvokeExpr.addArgument(left);
                 sqlMethodInvokeExpr.addArgument(right);
                 ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
-                LOGGER.error(LOG_PREFIX + "JSON操作符->替换为JSON_EXTRACT");
+                LOGGER.debug(LOG_PREFIX + "JSON操作符->替换为JSON_EXTRACT");
                 left.accept(this);
                 right.accept(this);
                 return false;
@@ -271,7 +271,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 sqlMethodInvokeExpr.addArgument(left);
                 sqlMethodInvokeExpr.addArgument(right);
                 ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
-                LOGGER.error(LOG_PREFIX + "JSON操作符->>替换为JSON_VALUE");
+                LOGGER.debug(LOG_PREFIX + "JSON操作符->>替换为JSON_VALUE");
                 left.accept(this);
                 right.accept(this);
                 return false;
@@ -298,7 +298,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
             String name = dataType.getName();
             if (StrUtil.equalsAny(name, true, "bit", "int", "bigint", "smallint", "double") && CollUtil.isNotEmpty(dataType.getArguments())) {
                 ReflectUtil.setFieldValue(dataType, "arguments", new ArrayList<>(0));
-                LOGGER.error(LOG_PREFIX + "bit/int等去除长度");
+                LOGGER.debug(LOG_PREFIX + "bit/int等去除长度");
             }
         }
         return true;
