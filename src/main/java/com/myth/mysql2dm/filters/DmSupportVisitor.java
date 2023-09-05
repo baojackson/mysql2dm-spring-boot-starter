@@ -163,6 +163,13 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                     }
                 }
                 break;
+            case "date_format":
+                List<SQLExpr> arguments = x.getArguments();
+                SQLExpr sqlExpr = arguments.get(1);
+                SQLCharExpr sqlCharExpr = (SQLCharExpr) sqlExpr;
+                sqlCharExpr.setText(this.resolveForDateFormat(sqlCharExpr.getText()));
+                LOGGER.debug(LOG_PREFIX + "date_format格式处理");
+                return true;
             case "json_unquote":
                 SQLExpr arg0 = x.getArguments().get(0);
                 x.setArgument(0, new SQLCharExpr("\""));
@@ -215,6 +222,35 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 break;
         }
         return true;
+    }
+
+    private String resolveForDateFormat(String content) {
+        boolean flag = false;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            char thisChar = content.charAt(i);
+            if (thisChar == '%') {
+                if (i == 0) {
+                    sb.append(thisChar);
+                } else {
+                    sb.append("\"").append(thisChar);
+                }
+                flag = true;
+            } else {
+                if (flag) {
+                    sb.append(thisChar).append("\"");
+                } else {
+                    if (i == content.length() - 1) {
+                        sb.append(thisChar).append("\"");
+                    } else {
+                        sb.append(thisChar);
+                    }
+
+                }
+                flag = false;
+            }
+        }
+        return sb.toString();
     }
 
     /**

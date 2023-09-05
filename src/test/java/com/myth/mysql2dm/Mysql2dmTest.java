@@ -18,7 +18,7 @@ public class Mysql2dmTest {
 
     @Test
     public void test01() {
-        String originalSql = "SELECT DATE_ADD(now(),INTERVAL '2' DAY);";
+        String originalSql = "SELECT DATE_FORMAT(now(), '%H:00') AS formatted_time;";
         String modifiedSql = this.modifySql(originalSql);
         System.out.println();
     }
@@ -40,5 +40,42 @@ public class Mysql2dmTest {
             LOGGER.error(StrUtil.format("dameng adapter modify failed, sql: {}", originalSql), e);
             return originalSql;
         }
+    }
+
+    @Test
+    public void test02() {
+        String content = "%Y-00%m00";
+        String string = resolveForDateFormat(content);
+
+        System.out.println(string);
+    }
+
+    private String resolveForDateFormat(String content) {
+        boolean flag = false;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            char thisChar = content.charAt(i);
+            if (thisChar == '%') {
+                if (i == 0) {
+                    sb.append(thisChar);
+                } else {
+                    sb.append("\"").append(thisChar);
+                }
+                flag = true;
+            } else {
+                if (flag) {
+                    sb.append(thisChar).append("\"");
+                } else {
+                    if (i == content.length() - 1) {
+                        sb.append(thisChar).append("\"");
+                    } else {
+                        sb.append(thisChar);
+                    }
+
+                }
+                flag = false;
+            }
+        }
+        return sb.toString();
     }
 }

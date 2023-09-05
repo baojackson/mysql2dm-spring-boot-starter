@@ -113,3 +113,13 @@ CREATE FUNCTION FUNC_OP_MY_DIVIDE( C1 IN NUMBER,
 > 说明
 > 
 > expr若是非数字或字符串等特殊表达式, 将会得到错误的形式
+
+### date_format格式处理
+
+> 说明
+>
+>
+
+## 已知不支持的功能
+
+### 
