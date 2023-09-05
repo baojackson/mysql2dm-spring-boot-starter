@@ -19,13 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 支持的功能如下：
- * `->"
- * GROUP_CONCAT->WM_CONCAT, 仅支持单个参数的
- * IF->CASE WHEN
- * 除法表达式加分母为0校验
- * boolean->0/1
- * DDL语句bit,int去除参数
+ * @author myth
  */
 public class DmSupportVisitor extends MySqlASTVisitorAdapter {
 
