@@ -238,7 +238,11 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 flag = true;
             } else {
                 if (flag) {
-                    sb.append(thisChar).append("\"");
+                    if (i == content.length() - 1) {
+                        sb.append(thisChar);
+                    } else {
+                        sb.append(thisChar).append("\"");
+                    }
                 } else {
                     if (i == content.length() - 1) {
                         sb.append(thisChar).append("\"");
