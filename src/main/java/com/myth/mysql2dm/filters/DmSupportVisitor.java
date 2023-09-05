@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 支持的功能如下：
@@ -309,6 +310,20 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
         SQLObject parent = x.getParent();
         if (parent instanceof SQLReplaceable) {
             ((SQLReplaceable) parent).replace(x, new SQLCharExpr(x.getText()));
+            LOGGER.debug(LOG_PREFIX + "b'0/1'转'0/1'");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean visit(SQLIntervalExpr x) {
+        SQLExpr valueSqlExpr = x.getValue();
+        if (valueSqlExpr instanceof SQLValuableExpr) {
+            Object value = ((SQLValuableExpr) valueSqlExpr).getValue();
+            x.setValue(new SQLCharExpr(Objects.toString(value)));
+            LOGGER.debug(LOG_PREFIX + "INTERVAL expr unit中expr转字符");
+            // todo expr若是非数字或字符串等特殊表达式, 将会得到错误的形式
+            return false;
         }
         return true;
     }

@@ -107,3 +107,9 @@ CREATE FUNCTION FUNC_OP_MY_DIVIDE( C1 IN NUMBER,
 ### b'0/1'替换为'0/1'
 
 > 说明
+
+### INTERVAL expr unit中expr转字符
+
+> 说明
+> 
+> expr若是非数字或字符串等特殊表达式, 将会得到错误的形式
