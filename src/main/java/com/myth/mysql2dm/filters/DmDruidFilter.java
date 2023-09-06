@@ -175,14 +175,21 @@ public class DmDruidFilter extends FilterEventAdapter {
             sqlStatement.accept(visitor);
             String modifiedSql = sqlStatement.toString();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(StrUtil.format("dameng adapter modify success, origin sql: {}, \n" +
-                        "actual sql: {}", originalSql, modifiedSql));
+                LOGGER.debug(StrUtil.format("DMAdapter Modify Success -->\n" +
+                        "Origin Sql: \n" +
+                        "{}, \n" +
+                        "Actual Sql: \n" +
+                        "{}", originalSql, modifiedSql));
             } else {
-                LOGGER.error(StrUtil.format("dameng adapter modify success, actual sql: {}", modifiedSql));
+                LOGGER.error(StrUtil.format("DMAdapter Modify Success -->\n" +
+                        "Actual Sql: \n" +
+                        "{}", modifiedSql));
             }
             return modifiedSql;
         } catch (Exception e) {
-            LOGGER.error(StrUtil.format("dameng adapter modify failed, sql: {}", originalSql), e);
+            LOGGER.error(StrUtil.format("DMAdapter Modify Failed -->\n" +
+                    "Origin Sql: \n" +
+                    "{}", originalSql), e);
             return originalSql;
         }
     }

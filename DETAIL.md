@@ -122,4 +122,14 @@ CREATE FUNCTION FUNC_OP_MY_DIVIDE( C1 IN NUMBER,
 
 ## 已知不支持的功能
 
-### 
+### is [not] val[非null]
+
+> 说明
+> 
+> 例如 col1 is false、col1 is not 0
+
+### str_to_date函数
+
+> 说明
+>
+> 去掉
