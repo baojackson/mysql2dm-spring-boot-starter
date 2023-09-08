@@ -128,11 +128,11 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
         String methodName = x.getMethodName();
         methodName = methodName.toLowerCase();
         SQLObject parent = x.getParent();
+        List<SQLExpr> arguments = x.getArguments();
         switch (methodName) {
             case "if":
                 if (parent instanceof SQLReplaceable) {
                     SQLReplaceable sqlReplaceable = (SQLReplaceable) parent;
-                    List<SQLExpr> arguments = x.getArguments();
                     SQLExpr sqlExpr0 = arguments.get(0);
                     SQLExpr sqlExpr1 = arguments.get(1);
                     SQLExpr sqlExpr2 = arguments.get(2);
@@ -150,7 +150,6 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
             case "convert":
                 if (parent instanceof SQLReplaceable) {
                     SQLReplaceable sqlReplaceable = (SQLReplaceable) parent;
-                    List<SQLExpr> arguments = x.getArguments();
                     SQLExpr sqlExpr0 = arguments.get(0);
                     SQLExpr sqlExpr1 = arguments.get(1);
                     if (sqlExpr1 instanceof SQLDataTypeRefExpr) {
@@ -164,14 +163,13 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                 }
                 break;
             case "date_format":
-                List<SQLExpr> arguments = x.getArguments();
                 SQLExpr sqlExpr = arguments.get(1);
                 SQLCharExpr sqlCharExpr = (SQLCharExpr) sqlExpr;
                 sqlCharExpr.setText(this.resolveForDateFormat(sqlCharExpr.getText()));
                 LOGGER.debug(LOG_PREFIX + "date_format格式处理");
                 return true;
             case "json_unquote":
-                SQLExpr arg0 = x.getArguments().get(0);
+                SQLExpr arg0 = arguments.get(0);
                 x.setArgument(0, new SQLCharExpr("\""));
                 x.setMethodName("TRIM");
                 x.setFrom(arg0);
@@ -191,15 +189,15 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
                     SQLMethodInvokeExpr sqlMethodInvokeExpr = new SQLMethodInvokeExpr("dmgeo.ST_GeomFromText");
                     SQLMethodInvokeExpr concatMethod = new SQLMethodInvokeExpr("CONCAT");
                     concatMethod.addArgument(new SQLCharExpr("POINT("));
-                    for (SQLExpr argument : x.getArguments()) {
-                        concatMethod.addArgument(argument);
-                    }
+                    concatMethod.addArgument(arguments.get(0));
+                    concatMethod.addArgument(new SQLCharExpr(String.valueOf(StrPool.C_SPACE)));
+                    concatMethod.addArgument(arguments.get(1));
                     concatMethod.addArgument(new SQLCharExpr(")"));
                     sqlMethodInvokeExpr.addArgument(concatMethod);
                     sqlMethodInvokeExpr.addArgument(new SQLNumberExpr(0));
                     ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
                     LOGGER.debug(LOG_PREFIX + "POINT转dmgeo.ST_GeomFromText(CONCAT('POINT(',arg0,arg1,)'))");
-                    for (SQLExpr argument : sqlMethodInvokeExpr.getArguments()) {
+                    for (SQLExpr argument : arguments) {
                         argument.accept(this);
                     }
                     return false;
@@ -208,7 +206,7 @@ public class DmSupportVisitor extends MySqlASTVisitorAdapter {
             case "geometryfromtext":
                 if (parent instanceof SQLReplaceable) {
                     SQLMethodInvokeExpr sqlMethodInvokeExpr = new SQLMethodInvokeExpr("dmgeo.ST_GeomFromText");
-                    sqlMethodInvokeExpr.addArgument(x.getArguments().get(0));
+                    sqlMethodInvokeExpr.addArgument(arguments.get(0));
                     sqlMethodInvokeExpr.addArgument(new SQLNumberExpr(0));
                     ((SQLReplaceable) parent).replace(x, sqlMethodInvokeExpr);
                     LOGGER.debug(LOG_PREFIX + "geometry_from_text转dmgeo.ST_GeomFromText");
