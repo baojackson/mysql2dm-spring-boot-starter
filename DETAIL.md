@@ -133,3 +133,17 @@ CREATE FUNCTION FUNC_OP_MY_DIVIDE( C1 IN NUMBER,
 > 说明
 >
 > 去掉
+
+### case when中条件表达式作为where条件或者if条件或者select列等
+
+> 说明
+> 
+> 不支持的写法
+> * `where case when t>0 then a>0 else b>0 end`
+> * `if(case when t>0 then a>0 else b>0 end,1,0)`
+> * `select case when t>0 then a>0 else b>0 end`
+> 
+> 换写法
+> 
+> 例如 `where case when t>0 then a>0 else b>0 end`可以改成`where case when t>0 then a else b end >0`
+> 或者改成`where ((t>0 and a>0) or b>0)`
